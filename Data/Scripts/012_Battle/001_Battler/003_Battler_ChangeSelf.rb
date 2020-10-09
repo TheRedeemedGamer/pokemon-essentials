@@ -167,15 +167,16 @@ class PokeBattle_Battler
 
   def pbCheckFormOnWeatherChange
     return if fainted? || @effects[PBEffects::Transform]
+    return if hasActiveItem?(:UTILITYUMBRELLA)
     # Castform - Forecast
     if isSpecies?(:CASTFORM)
-      if hasActiveAbility?(:FORECAST) && !self.hasActiveItem?(:UTILITYUMBRELLA)
+      if hasActiveAbility?(:FORECAST)
         newForm = 0
         case @battle.pbWeather
         when PBWeather::Sun, PBWeather::HarshSun
-          newForm = 1 if !self.hasActiveItem?(:UTILITYUMBRELLA)
+          newForm = 1
         when PBWeather::Rain, PBWeather::HeavyRain
-          newForm = 2 if !self.hasActiveItem?(:UTILITYUMBRELLA)
+          newForm = 2
         when PBWeather::Hail
           newForm = 3
         end
@@ -193,7 +194,7 @@ class PokeBattle_Battler
       if hasActiveAbility?(:FLOWERGIFT)
         newForm = 0
         case @battle.pbWeather
-        when PBWeather::Sun, PBWeather::HarshSun; newForm = 1 if !self.hasActiveItem?(:UTILITYUMBRELLA)
+        when PBWeather::Sun, PBWeather::HarshSun; newForm = 1
         end
         if @form!=newForm
           @battle.pbShowAbilitySplash(self,true)
@@ -205,21 +206,11 @@ class PokeBattle_Battler
       end
     end
     # Eiscue - Ice Face
-    if isConst?(@species,PBSpecies,:EISCUE)
-      if hasActiveAbility?(:ICEFACE)
-        case @battle.pbWeather
-        when PBWeather::Hail
-          for i in @battle.field.effects[PBEffects::Noiceface]
-            return if self == i
-          end
-          if @form!=0
-            @battle.pbShowAbilitySplash(self,true)
-            @battle.pbHideAbilitySplash(self)
-            pbChangeForm(0,_INTL("{1} transformed!",pbThis))
-            self.damageState.iceface = false
-            @battle.field.effects[PBEffects::Noiceface].push(self)
-          end
-        end
+    if isConst?(@species,PBSpecies,:EISCUE) && hasActiveAbility?(:ICEFACE) && @battle.pbWeather == PBWeather::Hail
+      if @form==1
+        @battle.pbShowAbilitySplash(self,true)
+        @battle.pbHideAbilitySplash(self)
+        pbChangeForm(0,_INTL("{1} transformed!",pbThis))
       end
     end
   end

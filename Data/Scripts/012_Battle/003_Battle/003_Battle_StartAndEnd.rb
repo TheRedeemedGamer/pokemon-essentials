@@ -281,6 +281,7 @@ class PokeBattle_Battle
     when PBWeather::HeavyRain;   pbDisplay(_INTL("It is raining heavily."))
     when PBWeather::StrongWinds; pbDisplay(_INTL("The wind is strong."))
     when PBWeather::ShadowSky;   pbDisplay(_INTL("The sky is shadowy."))
+    when PBWeather::Fog;         pbDisplay(_INTL("The fog is deep..."))
     end
     # Terrain announcement
     pbCommonAnimation(PBBattleTerrains.animationName(@field.terrain))
@@ -384,16 +385,6 @@ class PokeBattle_Battle
   end
 
   def pbEndOfBattle
-    # Zacian/Zamazenta
-    for i in @party1
-      if (i.species == 888 || i.species == 889) && i.form == 1
-        for j in i.moves
-          if j.id == 708 || j.id == 707
-            j.id = 628
-          end
-        end
-      end
-    end
     oldDecision = @decision
     @decision = 4 if @decision==1 && wildBattle? && @caughtPokemon.length>0
     case oldDecision
